@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "django_settings": "dev.settings",
+        "profile_name": "zappa",
+        "project_name": "dev",
+        "runtime": "python3.6",
+        "s3_bucket": "zappa-t7h04ap7g",
+		"exclude": ["front"]
+    }
+}
