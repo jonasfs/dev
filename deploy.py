@@ -6,28 +6,14 @@
 #
 
 import json
-import subprocess
 import os
 import sys
 from time import sleep
 from django.core.management import utils
 
+from deploy_utils import call_command
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-def call_command(string, input=None, cwd=BASE_DIR):
-	cmd = string.split(' ')
-	output = subprocess.run(
-		cmd,
-		stdout=subprocess.PIPE,
-		encoding="utf-8",
-		input=input,
-		cwd=cwd
-	)
-	return output
-
-
 aws = {}
 
 # check for files that shouldn't be here

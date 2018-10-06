@@ -13,6 +13,7 @@ django-filter = "*"
 "flake8" = "*"
 zappa = "*"
 django-cors-headers = "*"
+awscli = "*"
 
 [requires]
 python_version = "3.6"
