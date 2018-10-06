@@ -40,6 +40,10 @@ if os.path.isfile('./zappa_settings.json'):
 	sys.exit(0)
 
 # create stack
+msg = 'Enter your amazon credentials profile name (default \'default\'):'
+amazon_user = input(msg)
+if amazon_user == '':
+	print(amazon_user)
 stack_name = input('Enter the stack name: ')
 parm_name = input('Enter the DB name: ')
 parm_user = input('Enter the DB master username: ')
@@ -90,7 +94,7 @@ with open('env.json', 'w') as stream:
 
 cmd = 'zappa init'
 print(cmd)
-cmd_result = call_command(cmd, '\nzappa\n\ndev.settings\n\n\n')
+cmd_result = call_command(cmd, '\n' + amazon_user + '\n\ndev.settings\n\n\n')
 
 zappa_json = None
 with open('zappa_settings.json', 'r') as stream:
