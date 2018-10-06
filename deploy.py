@@ -29,7 +29,7 @@ if os.path.isfile('./zappa_settings.json'):
 msg = 'Enter your amazon credentials profile name (default \'default\'):'
 amazon_user = input(msg)
 if amazon_user == '':
-	print(amazon_user)
+	amazon_user = 'default'
 stack_name = input('Enter the stack name: ')
 parm_name = input('Enter the DB name: ')
 parm_user = input('Enter the DB master username: ')
