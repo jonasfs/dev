@@ -8,8 +8,7 @@
 import subprocess
 import os
 
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+from dev.local_settings import BASE_DIR
 
 
 def call_command(string, input=None, cwd=BASE_DIR):

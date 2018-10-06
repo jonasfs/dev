@@ -1,16 +1,26 @@
 import json
 import os
+import sys
 from urllib.parse import urlparse
+from pathlib import Path
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-path = BASE_DIR + '/env.json'
 aws = {}
+try:
+    path = Path(BASE_DIR + '/env.json')
 
-with open(path, 'r') as stream:
-	aws = json.load(stream)
+    with open(path, 'r') as stream:
+            aws = json.load(stream)
+except FileNotFoundError:
+    pass
 
-SECRET_KEY = aws['SECRETKEY']
+
+try:
+    SECRET_KEY = aws['SECRETKEY']
+except KeyError:
+    SECRET_KEY = None
 DEBUG = False
+
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS.append('127.0.0.1')
 try:
@@ -24,13 +34,16 @@ except (KeyError, AttributeError) as e:
 	pass
 
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': aws['DBNAME'],
-		'USER': aws['DBUSER'],
-		'PASSWORD': aws['DBPASS'],
-		'HOST': aws['DBHOST'],
-		'PORT': 5432,
-	}
-}
+try:
+    DATABASES = {
+            'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': aws['DBNAME'],
+                    'USER': aws['DBUSER'],
+                    'PASSWORD': aws['DBPASS'],
+                    'HOST': aws['DBHOST'],
+                    'PORT': 5432,
+            }
+    }
+except KeyError:
+    DATABASES = None

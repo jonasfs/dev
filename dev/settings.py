@@ -128,16 +128,12 @@ STATIC_URL = '/static/'
 
 # CORS
 CSRF_TRUSTED_ORIGINS = (
-	local_settings.ALLOWED_HOSTS[0],
-	local_settings.ALLOWED_HOSTS[1],
-	local_settings.ALLOWED_HOSTS[2],
+	tuple(local_settings.ALLOWED_HOSTS)
 )
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-	local_settings.ALLOWED_HOSTS[0],
-	local_settings.ALLOWED_HOSTS[1],
-	local_settings.ALLOWED_HOSTS[2],
+	tuple(local_settings.ALLOWED_HOSTS)
 )
 
 CORS_ALLOW_CREDENTIALS = True
