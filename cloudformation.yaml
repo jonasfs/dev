@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: BriteCore selection proccess template
+Outputs:
+  BUCKETNAME:
+    Value:
+      Ref: S3Bucket
+  DBHOST:
+    Value:
+      Fn::GetAtt:
+      - myDB
+      - Endpoint.Address
+  DBNAME:
+    Value:
+      Ref: DBNAME
+  DBPASS:
+    Value:
+      Ref: DBPASSWORD
+  DBUSER:
+    Value:
+      Ref: DBUSERNAME
+  FRONTENDURL:
+    Value:
+      Fn::GetAtt:
+      - S3Bucket
+      - WebsiteURL
+Parameters:
+  DBPASSWORD:
+    Type: String
+  DBUSERNAME:
+    Type: String
+  DBNAME:
+    Type: String
+Resources:
+  BucketPolicy:
+    Properties:
+      Bucket:
+        Ref: S3Bucket
+      PolicyDocument:
+        Id: MyPolicy
+        Statement:
+        - Action: s3:GetObject
+          Effect: Allow
+          Principal: '*'
+          Resource:
+            Fn::Join:
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: S3Bucket
+              - /*
+          Sid: PublicReadForGetBucketObjects
+        Version: '2012-10-17'
+    Type: AWS::S3::BucketPolicy
+  S3Bucket:
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+    Type: AWS::S3::Bucket
+  myDB:
+    Properties:
+      AllocatedStorage: '20'
+      DBInstanceClass: db.t2.micro
+      DBName:
+        Ref: DBNAME
+      DBSecurityGroups:
+      - Ref: mySecurityGroup
+      Engine: postgres
+      MasterUserPassword:
+        Ref: DBPASSWORD
+      MasterUsername:
+        Ref: DBUSERNAME
+      PubliclyAccessible: 'true'
+    Type: AWS::RDS::DBInstance
+  mySecurityGroup:
+    Properties:
+      DBSecurityGroupIngress:
+      - CIDRIP: 0.0.0.0/0
+      GroupDescription: Permissive postgres security group
+    Type: AWS::RDS::DBSecurityGroup

@@ -2,8 +2,10 @@ __pycache__
 *.log
 front/dist
 front/node_modules
-dev/local_settings.py
 Pipfile.lock
 *.pyc
 zappa_settings.json
 front/static
+generate_cloudformation.py
+env.json
+test.py
