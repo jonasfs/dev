@@ -5,7 +5,6 @@ front/node_modules
 Pipfile.lock
 *.pyc
 zappa_settings.json
-front/static
 generate_cloudformation.py
 env.json
 test.py
