@@ -1,6 +1,30 @@
 # dev
 Website developed for the application process at BriteCore, done with Vue.js and Django Rest Framework
 
+Demo at:
+- http://britecoretest5-s3bucket-3c3aep3xs79y.s3-website-sa-east-1.amazonaws.com/ (front)
+- https://1yaby9bccg.execute-api.sa-east-1.amazonaws.com/dev/api/ (api)
+
+The general idea is that the customer defines their RiskTypes, by choosing an unique name (a string) and setting up the fields (a [JSONField](https://docs.djangoproject.com/en/2.1/ref/contrib/postgres/fields/#django.contrib.postgres.fields.JSONField)).
+
+The fields are defined by name and type, the possible types being `number`, `date`, `text` and an "enum" type that should be presented as a serializable json list of strings (these strings being the possibles choices). Here's an example of a RiskType with all the fields:
+```
+{
+  "name": "Car",
+  "fields": {
+    "owner": "text",
+    "price": "number",
+    "first_owner": "[\"yes\",\"no\"]",
+    "purchased_in": "date"
+  }
+}
+```
+
+Any special behavior the fields could have would be serialized inside the value as list of attributes (for example, besides a " type" attribute, fields could have a "unique": "true", or "blank": "true" and so forth). Validation would be done then on the RiskType serializer and any omitted attributes would have a default value. Since the project specification didnt require any of this, I didnt provide a specification and assumed that no extra information would be required, there would be no defaults, etc, but it would be easy to change the structure of `fields` to adapt to whatever would be the case (no schema changes would be needed after all, we just would need to migrate the data to a new format).
+
+The RiskTypes table is responsible only for holding the types defined by the users, and since this is what the project specification asked, there is no need for any other table or model. If this ever went to production or the project required that the user should be able to submit the form, I would define a Risks table to hold the actual instances of the types. The model would then have a foreignkey for a risktype, and a field to hold the data (which would be also a JSONField, that would hold a list of json objects with the field name for keys and naturally their values).
+
+
 # Setup
 
 First you must install all the packages in requirements.txt by running `pip -r requirements.txt`. Then cd into the front/ folder and install all the npm packages in package.json by running `npm install` (this might take a while).
@@ -18,7 +42,7 @@ If needed, you can do it without the script by following these steps:
 
 - Create the CloudFormation stack using the cloudformation.yaml: `aws cloudformation create-stack --stack-name <stack name> --template-body file://./cloudformation.yaml --parameters ParameterKey=DBUSERNAME,ParameterValue=<db user> ParameterKey=DBPASSWORD,ParameterValue=<db password> ParameterKey=DBNAME,ParameterValue=<db name>` 
 - Wait until the stack is created
-- Run `aws cloudformation describe-stacks --stack-name <stack name>` and create a `env.json` file containing ALL THE KEYS AND VALUES under the `"Outputs"` section. This step is very important! (for example, for an OutputKey called FRONTENDURL, add `"FRONTENDURL":"your actual frontendurl value"` to the `env.json` file)
+- Run `aws cloudformation describe-stacks --stack-name <stack name>` and create a `env.json` file containing **ALL THE KEYS AND VALUES** under the `"Outputs"` section. This step is very important! (for example, for an OutputKey called FRONTENDURL, add `"FRONTENDURL":"your actual frontendurl value"` to the `env.json` file)
 - Add to the `env.json` file a key called `"STACKNAME"` with the name of the stack you supplied previously
 - Add to the `env.json` file a key called `"SECRETKEY"` with a random key of your choice. This will be the value used for the SECRET_KEY on the Django project settings (adding it to `env.json` will suffice, the app will load it from there) 
 - Create your `zappa_settings.json` by running `zappa init` (point the settings file to `dev.settings`) 
@@ -33,7 +57,7 @@ If needed, you can do it without the script by following these steps:
 
 # Populating the DB
 
-After deploying, the database will be empty, so there will be nothing to render on the frontend. You can interact with the backend by using tools like curl, httpie, or by enabling the Django REST Framework browsable API.  
+After deploying, the database will be empty, so there will be nothing to render on the frontend. You can interact with the backend by using tools like curl, httpie, or by enabling the Django REST Framework browsable API (no auth needed).  
 
 With curl, try the following for setting up a sample RiskType that contains all the possible field types. Note that the content-type must be valid json, and that enum fields are defined with valid json too (parsable by python's `json.loads` function):
 
