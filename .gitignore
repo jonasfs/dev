@@ -6,5 +6,6 @@ Pipfile.lock
 *.pyc
 zappa_settings.json
 generate_cloudformation.py
-env.json
+env.yaml
 test.py
+package-lock.json

@@ -182,6 +182,7 @@ class RiskTypeTests(APITestCase):
 	def test_put_risktype(self):
 		url = self.url
 		response = self.response
+		print(str(response.data))
 		rt_id = str(response.data['id'])
 		put_url = url + rt_id + '/'
 

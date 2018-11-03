@@ -1,20 +1,27 @@
-from dev import local_settings
 import os
+import yaml
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+ENV_YAML = None
+with open(os.path.join(BASE_DIR, 'env.yaml'), 'r') as stream:
+	ENV_YAML = yaml.load(stream, Loader=yaml.Loader)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = local_settings.SECRET_KEY
+SECRET_KEY = ENV_YAML['SECRETKEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = local_settings.DEBUG
+DEBUG = ENV_YAML['DEBUG']
 
-ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
+ALLOWED_HOSTS = []
+if ENV_YAML['FRONTHOST'] not in ALLOWED_HOSTS:
+	ALLOWED_HOSTS.append(ENV_YAML['FRONTHOST'])
+if ENV_YAML['APIHOST'] not in ALLOWED_HOSTS:
+	ALLOWED_HOSTS.append(ENV_YAML['APIHOST'])
 
 
 # Application definition
@@ -76,7 +83,16 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = local_settings.DATABASES
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.postgresql',
+		'NAME': ENV_YAML['DBNAME'],
+		'USER': ENV_YAML['DBUSER'],
+		'PASSWORD': ENV_YAML['DBPASSWORD'],
+		'HOST': ENV_YAML['DBHOST'],
+		'PORT': ENV_YAML['DBPORT']
+	}
+}
 
 
 # Password validation
@@ -128,12 +144,12 @@ STATIC_URL = '/static/'
 
 # CORS
 CSRF_TRUSTED_ORIGINS = (
-	tuple(local_settings.ALLOWED_HOSTS)
+	tuple(ALLOWED_HOSTS)
 )
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-	tuple(local_settings.ALLOWED_HOSTS)
+	tuple(ALLOWED_HOSTS)
 )
 
 CORS_ALLOW_CREDENTIALS = True

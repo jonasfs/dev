@@ -10,6 +10,7 @@ FIELD_TYPES = ['text', 'date', 'number']
 
 
 class RiskTypeSerializer(serializers.HyperlinkedModelSerializer):
+	id = serializers.IntegerField(read_only=True)
 	class Meta:
 		model = RiskType
 		fields = '__all__'
