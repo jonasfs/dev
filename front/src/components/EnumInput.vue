@@ -9,7 +9,7 @@ export default {
 	props: {
 		name: String,
 		initialValue: String,
-		choices: String,
+		choices: Array,
 	},
 	data() {
 		return {
@@ -18,7 +18,7 @@ export default {
 		};
 	},
 	created() {
-		this.choiceList = JSON.parse(this.choices);
+		this.choiceList = this.choices;
 		this.value = this.initialValue;
 	},
 	methods: {

@@ -3,22 +3,77 @@ import json
 from rest_framework import serializers
 
 from .models import (
+	GenericField,
+	TextField,
+	NumberField,
+	DateField,
+	EnumField,
 	RiskType,
 )
 
 FIELD_TYPES = ['text', 'date', 'number']
 
+class EnumFieldSerializer(serializers.ModelSerializer):
+	field_type = serializers.SerializerMethodField(read_only=True)
+
+
+	class Meta:
+		model = EnumField
+		exclude = ('risktype',)
+
+
+	def get_field_type(self, obj):
+		obj_with_class = GenericField.objects.get_subclass(id=obj.id)
+		return type(obj_with_class).__name__
+
+class FieldSerializer(serializers.ModelSerializer):
+	field_type = serializers.SerializerMethodField(read_only=True)
+
+
+	class Meta:
+		model = GenericField
+		exclude = ('risktype',)
+	
+
+	def get_field_type(self, obj):
+		obj_with_class = GenericField.objects.get_subclass(id=obj.id)
+		return type(obj_with_class).__name__
+
+
+	def to_representation(self, obj):
+		# Every 'try, except' here is checking for the field type in order to 
+		# use the correct serializer.
+		# Since the only special serializer is the enum type one, we left all 
+		# the others using the default FieldSerializer.
+		try:
+			enum_field_obj = EnumField.objects.get(id=obj.id)
+			return EnumFieldSerializer(
+				enum_field_obj,
+				context=self.context
+			).to_representation(enum_field_obj)
+		except EnumField.DoesNotExist:
+			pass
+
+		return super(FieldSerializer, self).to_representation(obj)
+
 
 class RiskTypeSerializer(serializers.HyperlinkedModelSerializer):
 	id = serializers.IntegerField(read_only=True)
+	fields = FieldSerializer(
+		many=True,
+		read_only=True
+	)
+
+
 	class Meta:
 		model = RiskType
 		fields = '__all__'
 
+
 	# field types validation
 	def validate_fields(self, value):
-		field_names = value.keys()
 		try:
+			field_names = value.keys()
 			if (len(field_names) == 0):
 				message = "Insufficient data"
 				raise serializers.ValidationError(message)
@@ -26,30 +81,51 @@ class RiskTypeSerializer(serializers.HyperlinkedModelSerializer):
 
 				try:
 					if (
-						(not (
-							(field_type[0] == '[') and (field_type[-1] == ']')
-						)) and field_type not in FIELD_TYPES):
+						(not isinstance(field_type, (list,)))
+						   and (field_type not in FIELD_TYPES)
+					):
 						message = field_name + ": Invalid field type ("
-						message += field_type + ")"
+						message += str(field_type) + ")"
 						raise serializers.ValidationError(message)
-					# check for enum too
-					elif (field_type[0] == '[') and (field_type[-1] == ']'):
-						try:
-							json.loads(field_type)
-						except ValueError:
-							message = field_name + ": Invalid JSON ("
-							message += field_type + ")"
-							raise serializers.ValidationError(message)
 				except IndexError:
 					if field_type != "":
 						message = field_name + ": Invalid field type ("
-						message += field_type + ")"
+						message += str(field_type) + ")"
 						raise serializers.ValidationError(message)
 		except AttributeError:
 			message = "Insufficient data"
 			raise serializers.ValidationError(message)
 
 		return value
+
+	def create(self, validated_data):
+		fields_data = self.context.get('fields')
+		self.validate_fields(fields_data)
+		risktype = RiskType.objects.create(**validated_data)
+
+		for field_name, field_type in fields_data.items():
+			if field_type == 'text':
+				TextField.objects.create(
+					name=field_name,
+					risktype=risktype
+				)
+			elif field_type == 'number':
+				NumberField.objects.create(
+					name=field_name,
+					risktype=risktype
+				)
+			elif field_type == 'date':
+				DateField.objects.create(
+					name=field_name,
+					risktype=risktype
+				)
+			elif isinstance(field_type, (list,)):
+				EnumField.objects.create(
+					name=field_name,
+					choices=field_type,
+					risktype=risktype
+				)
+		return risktype
 
 	def update(self, instance, validated_data):
 		method = str(self.context['request'].method)

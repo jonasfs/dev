@@ -22,11 +22,21 @@ export default {
 	},
 	created() {
 		this.fields = this.risk.fields;
-		Object.keys(this.fields).forEach((key) => {
-			this.values[key] = '';
+		this.fields.forEach((field) => {
+			this.values[field.name] = '';
 		});
 	},
 	methods: {
+		getFieldType(fieldType) {
+			if (fieldType === 'NumberField') {
+				return 'number';
+			} else if (fieldType === 'TextField') {
+				return 'text';
+			} else if (fieldType === 'DateField') {
+				return 'date';
+			}
+			return null;
+		},
 		getValue(name) {
 			return this.values[name];
 		},
@@ -47,37 +57,45 @@ export default {
 			</div>
 			<div
 				class="field"
-				v-for="(type, name, index) in fields"
+				v-for="(field, index) in fields"
 				:key="index"
 			>
 				<div class="field">
 					<label class="label">
-						{{name}}
+						{{field.name}}
 						<span v-if="
-							(type === 'number' || type === 'text') || type === 'date'"
+							(field.field_type === 'NumberField' || field.field_type === 'TextField')
+								|| field.field_type === 'DateField'
+							"
 						>
-							({{type}})
+							({{field.field_type}})
 						</span>
 						<span v-else>
-							(enum: {{type}})
+							(enum: {{field.choices}})
 						</span>
 					</label>
 					<div class="control">
-						<template v-if="
-							(type === 'number' || type === 'text') || type === 'date'"
+						<template
+							v-if="
+								(
+									field.field_type === 'NumberField'
+										|| field.field_type === 'TextField'
+								)
+									|| field.field_type === 'DateField'
+							"
 						>
 							<input
 								class="input"
-								:type="type"
-								:value="getValue(name)"
-								@input="setValue(name, $event.target.value)"
+								:type="getFieldType(field.field_type)"
+								:value="getValue(field.name)"
+								@input="setValue(field.name, $event.target.value)"
 							>
 						</template>
 						<template v-else>
 							<EnumInput
-								:name="name"
-								:choices="type"
-								:initialValue="getValue(name)"
+								:name="field.name"
+								:choices="field.choices"
+								:initialValue="getValue(field.name)"
 								@changeSelect="setValue"
 							>
 							</EnumInput>

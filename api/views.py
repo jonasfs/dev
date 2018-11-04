@@ -11,3 +11,11 @@ from .serializers import (
 class RiskTypeViewSet(viewsets.ModelViewSet):
 	queryset = RiskType.objects.all()
 	serializer_class = RiskTypeSerializer
+
+	def get_serializer_context(self):
+		context = super(RiskTypeViewSet, self).get_serializer_context()
+		try:
+			context['fields'] = self.request.data['fields']
+		except KeyError:
+			pass
+		return context
