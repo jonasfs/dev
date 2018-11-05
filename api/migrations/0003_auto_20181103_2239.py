@@ -6,14 +6,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('api', '0002_auto_20181103_2231'),
-    ]
+	dependencies = [
+		('api', '0002_auto_20181103_2231'),
+	]
 
-    operations = [
-        migrations.AlterField(
-            model_name='genericfield',
-            name='risktype',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='fields', to='api.RiskType'),
-        ),
-    ]
+	operations = [
+		migrations.AlterField(
+			model_name='genericfield',
+			name='risktype',
+			field=models.ForeignKey(
+				on_delete=django.db.models.deletion.CASCADE,
+				related_name='fields',
+				to='api.RiskType'
+			),
+		),
+	]

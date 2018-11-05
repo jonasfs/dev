@@ -34,5 +34,3 @@ class DateField(GenericField):
 
 class EnumField(GenericField):
 	choices = ArrayField(models.TextField())
-
-

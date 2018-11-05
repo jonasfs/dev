@@ -6,14 +6,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('api', '0003_auto_20181103_2239'),
-    ]
+	dependencies = [
+		('api', '0003_auto_20181103_2239'),
+	]
 
-    operations = [
-        migrations.AlterField(
-            model_name='enumfield',
-            name='choices',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.TextField(), size=None),
-        ),
-    ]
+	operations = [
+		migrations.AlterField(
+			model_name='enumfield',
+			name='choices',
+			field=django.contrib.postgres.fields.ArrayField(
+				base_field=models.TextField(),
+				size=None
+			),
+		),
+	]

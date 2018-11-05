@@ -6,7 +6,6 @@
 #
 
 import subprocess
-import os
 
 from dev.local_settings import BASE_DIR
 
