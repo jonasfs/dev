@@ -2,8 +2,8 @@
 Website developed for the application process at BriteCore, done with Vue.js and Django Rest Framework
 
 Demo at:
-- http://britecoretest5-s3bucket-3c3aep3xs79y.s3-website-sa-east-1.amazonaws.com/ (front)
-- https://1yaby9bccg.execute-api.sa-east-1.amazonaws.com/dev/api/ (api)
+- http://britejonas-s3bucket-1ehvn71auil04.s3-website-sa-east-1.amazonaws.com/ (front)
+- https://5054kz9z3f.execute-api.sa-east-1.amazonaws.com/dev/api/ (api)
 
 The general idea is that the customer defines their RiskTypes, by choosing an unique name (a string) and creating the fields, which are represented on the RiskType model by a reverse relationship (the RiskType being a ForeignKey of each field).
 
