@@ -14,7 +14,7 @@ describe('EnumInput.vue', () => {
 			propsData: {
 				name: 'first_owner',
 				initialValue: '',
-				choices: '[\"yes\",\"no\"]'
+				choices: ["yes","no"]
 			}
 		});
 		expect(wrapper.isVueInstance()).toBeTruthy();
@@ -27,7 +27,7 @@ describe('EnumInput.vue', () => {
 			propsData: {
 				name: 'first_owner',
 				initialValue: '',
-				choices: '[\"yes\",\"no\"]'
+				choices: ["yes","no"]
 			}
 		});
 		expect(wrapper.vm.choiceList).toEqual(["yes", "no"]);
