@@ -1,5 +1,6 @@
 import os
 import yaml
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,11 +18,13 @@ SECRET_KEY = ENV_YAML['SECRETKEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV_YAML['DEBUG']
 
+FRONTEND_HOST = urlparse(ENV_YAML['FRONTENDURL']).hostname
+BACKEND_HOST = urlparse(ENV_YAML['BACKENDURL']).hostname
 ALLOWED_HOSTS = []
-if ENV_YAML['FRONTHOST'] not in ALLOWED_HOSTS:
-	ALLOWED_HOSTS.append(ENV_YAML['FRONTHOST'])
-if ENV_YAML['APIHOST'] not in ALLOWED_HOSTS:
-	ALLOWED_HOSTS.append(ENV_YAML['APIHOST'])
+if FRONTEND_HOST not in ALLOWED_HOSTS:
+	ALLOWED_HOSTS.append(FRONTEND_HOST)
+if BACKEND_HOST not in ALLOWED_HOSTS:
+	ALLOWED_HOSTS.append(BACKEND_HOST)
 
 
 # Application definition
@@ -88,7 +91,7 @@ DATABASES = {
 		'ENGINE': 'django.db.backends.postgresql',
 		'NAME': ENV_YAML['DBNAME'],
 		'USER': ENV_YAML['DBUSER'],
-		'PASSWORD': ENV_YAML['DBPASSWORD'],
+		'PASSWORD': ENV_YAML['DBPASS'],
 		'HOST': ENV_YAML['DBHOST'],
 		'PORT': ENV_YAML['DBPORT']
 	}

@@ -8,6 +8,7 @@
 import json
 import os
 import sys
+import yaml
 from time import sleep
 from django.core.management import utils
 
@@ -26,10 +27,10 @@ if os.path.isfile('./zappa_settings.json'):
 	sys.exit(0)
 
 # create stack
-msg = 'Enter your amazon credentials profile name (default \'default\'):'
-amazon_user = input(msg)
-if amazon_user == '':
-	amazon_user = 'default'
+# msg = 'Enter your amazon credentials profile name (default \'default\'):'
+# amazon_user = input(msg)
+# if amazon_user == '':
+#	amazon_user = 'default'
 stack_name = input('Enter the stack name: ')
 parm_name = input('Enter the DB name: ')
 parm_user = input('Enter the DB master username: ')
@@ -74,13 +75,15 @@ for output in outputs:
 
 # setup backend with zappa
 aws['SECRETKEY'] = utils.get_random_secret_key()
+aws['DEBUG'] = False
+aws['DBPORT'] = 5432
 
-with open('env.json', 'w') as stream:
-	json.dump(aws, stream, indent=4)
+with open('env.yaml', 'w') as stream:
+	yaml.dump(aws, stream, default_flow_style=False)
 
 cmd = 'zappa init'
 print(cmd)
-cmd_result = call_command(cmd, '\n' + amazon_user + '\n\ndev.settings\n\n\n')
+cmd_result = call_command(cmd, '\n\ndev.settings\n\n\n')
 
 zappa_json = None
 with open('zappa_settings.json', 'r') as stream:
@@ -91,10 +94,11 @@ with open('zappa_settings.json', 'w') as stream:
 	json.dump(zappa_json, stream, indent=4)
 
 cmd = 'zappa deploy dev'
+print(cmd)
 cmd_result = call_command(cmd)
-print(cmd_result.stdout)
 
 cmd = 'zappa status dev'
+print(cmd)
 cmd_result = call_command(cmd)
 results = cmd_result.stdout.split('\n')
 result_msg = ""
@@ -104,15 +108,17 @@ url_start = result_msg.find('http')
 backend_url = result_msg[url_start:]
 aws['BACKENDURL'] = backend_url
 
-with open('env.json', 'w') as stream:
-	json.dump(aws, stream, indent=4)
+with open('env.yaml', 'w') as stream:
+	yaml.dump(aws, stream, default_flow_style=False)
 
 # updating api url on local_settings KNOWN_HOSTS
 cmd = 'zappa update dev'
+print(cmd)
 cmd_result = call_command(cmd)
 
 # init database
 cmd = 'zappa manage dev migrate'
+print(cmd)
 cmd_result = call_command(cmd)
 
 # setup frontend
@@ -127,7 +133,9 @@ with open('front/config/prod.env.js', 'w') as stream:
 # build
 
 cmd = 'npm run build'
+print(cmd)
 cmd_result = call_command(cmd, cwd=BASE_DIR + '/front')
 
 cmd = 'aws s3 sync ./dist s3://' + aws['BUCKETNAME']
+print(cmd)
 cmd_result = call_command(cmd, cwd=BASE_DIR + '/front')

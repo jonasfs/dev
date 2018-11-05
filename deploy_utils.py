@@ -6,10 +6,9 @@
 #
 
 import subprocess
+import os
 
-from dev.local_settings import BASE_DIR
-
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def call_command(string, input=None, cwd=BASE_DIR):
 	cmd = string.split(' ')
 	output = subprocess.run(
