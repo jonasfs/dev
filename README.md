@@ -43,7 +43,7 @@ The RiskTypes table is responsible only for holding the types defined by the use
 
 # Setup
 
-First you must install all the packages in requirements.txt by running `pip -r requirements.txt`. Then cd into the front/ folder and install all the npm packages in package.json by running `npm install` (this might take a while).
+First you must install all the packages in requirements.txt by running `pip install -r requirements.txt`. Then cd into the front/ folder and install all the npm packages in package.json by running `npm install` (this might take a while).
 
 Then, make sure your aws credentials are properly configured, including the region key. For the deploy.py script to work properly (see below), **you must not have any other profile other than the [default] one** defined on your .aws/credentials file. This is a compromise in order to work with how the zappa cli deals with different credentials files (this could be worked around, but to avoid adding more unnecessary complexity to the deploy file I decided to not do it).
 
