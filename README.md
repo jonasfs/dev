@@ -91,3 +91,17 @@ You can find your backend url on the env.yaml file that is generated after deplo
 For any change to the backend after deploying, simply run `zappa update dev` and zappa will take care of everything.
 
 For any change to the frontend run the `update_frontend.py` script, which will build the Vue.js app and sync it with your S3 bucket using aws cli tools (it will pick the bucket name from the env.yaml file that is generated after the first deploy). Alternatively, you can just build and deploy it manually by going to the `front/` directory and running `npm run build` and then `aws s3 sync ./dist s3://<your bucket name>`
+
+# Testing
+
+Make sure your env.yaml file is setup properly for development (for example, if everything is being hosted locally, use 127.0.0.1 as the hostname for all the url related keys), and your DBUSER has the CREATEDB permission on your database.
+
+## API
+
+Run `manage.py test`
+
+The tests are defined under api/tests.py
+
+## FRONTEND
+
+cd into front/ and run `npm run test`
