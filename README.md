@@ -7,7 +7,7 @@ Demo at:
 
 The general idea is that the customer defines their RiskTypes, by choosing an unique name (a string) and creating the fields, which are represented on the RiskType model by a reverse relationship (the RiskType being a ForeignKey of each field).
 
-The fields can be a TextField, NumberField, DateField or EnumField, all of which inherit common properties from a GenericField. Each of these classes can be extended with pertinent fields of their own. The EnumField, for example, has a `choices` field, which is an `ArrayField` of django's TextField (no to be confused with our own `TextField` models) that represent the possible choices. Currently the other fields have no special properties because the project specification doesnt require it. The Entity Relationship Diagram below illustrates the model:
+The fields can be a TextField, NumberField, DateField or EnumField, all of which inherit common properties from a GenericField. The EnumField has a special `choices` field, which is an `ArrayField` of django's TextField (no to be confused with our own `TextField` models) that represent the possible choices. Currently the other fields have no special properties because the project specification doesnt require it. The Entity Relationship Diagram below illustrates the model:
 ![ER Diagram](https://github.com/jonasfs/dev/raw/master/ERD.png "ER Diagram")
 
 Note that the reverse relationship on the RiskType model will actually have a queryset of GenericFields. The django extension `django-model-utils` helps us by providing a model manager that automatically selects the proper subclasses by merely appending methods like `._select_subclasses()` or `.get_subclass()` to our querysets. We use this to, among other things, determine which field serializer to use (check `serializers.py`)
@@ -38,14 +38,14 @@ Fields are created by POSTing a (not necessarily unique) name and a field_type, 
 }
 ```
 
-The RiskTypes table is responsible only for holding the types defined by the users, and since this is what the project specification asked, there is no need for any other table or model. If this ever went to production or the project required that the user should be able to submit the form, I would define a Risks table to hold the actual instances of the types. The model would then have a foreignkey for a risktype, and a field to hold the data.
+The RiskTypes table is responsible only for holding the types defined by the users. If this ever went to production or the project required that the user should be able to submit the form, I would define a Risks table to hold the actual instances of the types. The Risk model would then have a foreignkey for a risktype, and a counterpart to the RiskType.fields field (Risk.values?), to hold the actual fields data.
 
 
 # Setup
 
 First you must install all the packages in requirements.txt by running `pip -r requirements.txt`. Then cd into the front/ folder and install all the npm packages in package.json by running `npm install` (this might take a while).
 
-Then, make sure your aws credentials are properly configured, including the region key. For the deploy.py script to work properly (see below), **you must not have any other profile other than the [default] one** defined on your .aws/credentials file. This is a compromise in order to work with how the zappa cli deals with different credentials file (this could be worked around, but to avoid adding more unnecessary complexity to the deploy file I decided to not do it).
+Then, make sure your aws credentials are properly configured, including the region key. For the deploy.py script to work properly (see below), **you must not have any other profile other than the [default] one** defined on your .aws/credentials file. This is a compromise in order to work with how the zappa cli deals with different credentials files (this could be worked around, but to avoid adding more unnecessary complexity to the deploy file I decided to not do it).
 
 Only after that, run deploy.py with python3.6.
 
